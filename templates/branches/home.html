@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Find a branch · Bank Branch Contact Finder{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="hero-card card border-0 shadow-lg overflow-hidden">
+        <div class="card-body p-4 p-md-5">
+          <p class="text-uppercase small text-muted mb-1 tracking-wide">Public directory</p>
+          <h1 class="h2 fw-bold mb-3">Find branch contact numbers</h1>
+          <p class="text-secondary mb-4">Start typing a branch name. Matching locations appear instantly; select one to view the official contact line.</p>
+
+          <label for="branchSearch" class="form-label fw-semibold">Branch name or number</label>
+          <div class="position-relative">
+            <input type="text" id="branchSearch" class="form-control form-control-lg" autocomplete="off"
+                   placeholder="e.g. Pune Branch or 1234567890" aria-autocomplete="list" aria-controls="searchSuggestions"
+                   aria-expanded="false">
+            <ul class="list-group position-absolute w-100 shadow-sm mt-1 d-none z-3" id="searchSuggestions"
+                role="listbox" style="max-height: 280px; overflow-y: auto;"></ul>
+          </div>
+
+          <div id="resultPanel" class="mt-4 d-none">
+            <div class="p-4 rounded-3 result-panel-inner border">
+              <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                <div>
+                  <div class="text-muted small text-uppercase">Selected branch</div>
+                  <h2 class="h5 mb-1" id="resultName"></h2>
+                  <p class="mb-0 text-secondary small" id="resultAddress"></p>
+                </div>
+              </div>
+              <hr class="my-3">
+              <div class="text-muted small text-uppercase mb-1">Contact number</div>
+              <div class="d-flex flex-wrap align-items-center gap-2">
+                <span class="display-contact font-monospace fs-4 fw-semibold" id="resultPhone"></span>
+                <button type="button" class="btn btn-bank-primary" id="copyNumberBtn">
+                  Copy number
+                </button>
+              </div>
+              <p class="small text-success mt-2 mb-0 d-none" id="copyFeedback">Copied to clipboard.</p>
+            </div>
+          </div>
+
+          <p class="small text-muted mt-4 mb-0">Staff members can <a href="{% url 'login' %}">log in</a> to manage branch records.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+(function () {
+  const input = document.getElementById('branchSearch');
+  const list = document.getElementById('searchSuggestions');
+  const panel = document.getElementById('resultPanel');
+  const nameEl = document.getElementById('resultName');
+  const phoneEl = document.getElementById('resultPhone');
+  const addrEl = document.getElementById('resultAddress');
+  const copyBtn = document.getElementById('copyNumberBtn');
+  const copyFb = document.getElementById('copyFeedback');
+  let debounce;
+  let selectedId = null;
+  let currentNumber = '';
+
+  function hideSuggestions() {
+    list.classList.add('d-none');
+    list.innerHTML = '';
+    input.setAttribute('aria-expanded', 'false');
+  }
+
+  function showToast(message, variant) {
+    if (window.BankApp && window.BankApp.showToast) {
+      window.BankApp.showToast(message, variant);
+    }
+  }
+
+  async function fetchJSON(url) {
+    const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) throw new Error('Request failed');
+    return r.json();
+  }
+
+  input.addEventListener('input', function () {
+    clearTimeout(debounce);
+    const q = input.value.trim();
+    panel.classList.add('d-none');
+    selectedId = null;
+    if (q.length < 1) {
+      hideSuggestions();
+      return;
+    }
+    debounce = setTimeout(async () => {
+      try {
+        const data = await fetchJSON('{% url "branch_search_api" %}?q=' + encodeURIComponent(q));
+        list.innerHTML = '';
+        if (!data.results || !data.results.length) {
+          list.classList.remove('d-none');
+          const li = document.createElement('li');
+          li.className = 'list-group-item text-muted small';
+          li.textContent = 'No matches yet — try another spelling.';
+          list.appendChild(li);
+          input.setAttribute('aria-expanded', 'true');
+          return;
+        }
+        data.results.forEach((b) => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item list-group-item-action suggestion-item';
+          li.setAttribute('role', 'option');
+          li.dataset.id = b.id;
+          li.innerHTML = '<div class="fw-semibold">' + escapeHtml(b.branch_name) + '</div>' +
+            '<div class="small text-muted font-monospace">' + escapeHtml(b.contact_number) + '</div>';
+          li.addEventListener('click', () => selectBranch(b.id));
+          list.appendChild(li);
+        });
+        list.classList.remove('d-none');
+        input.setAttribute('aria-expanded', 'true');
+      } catch (e) {
+        showToast('Could not load suggestions. Check your connection.', 'danger');
+      }
+    }, 200);
+  });
+
+  function escapeHtml(s) {
+    return (s || '').replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+
+  async function selectBranch(id) {
+    try {
+      const b = await fetchJSON('{% url "branch_detail_api" %}?id=' + encodeURIComponent(id));
+      selectedId = id;
+      currentNumber = b.contact_number || '';
+      nameEl.textContent = b.branch_name || '';
+      phoneEl.textContent = currentNumber;
+      addrEl.textContent = b.address ? b.address : '';
+      addrEl.classList.toggle('d-none', !b.address);
+      panel.classList.remove('d-none');
+      hideSuggestions();
+      input.value = b.branch_name || '';
+      copyFb.classList.add('d-none');
+    } catch (e) {
+      showToast('Could not load branch details.', 'danger');
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    if (!list.contains(e.target) && e.target !== input) hideSuggestions();
+  });
+
+  copyBtn.addEventListener('click', async function () {
+    if (!currentNumber) return;
+    try {
+      await navigator.clipboard.writeText(currentNumber);
+      copyFb.classList.remove('d-none');
+      showToast('Contact number copied.', 'success');
+    } catch (e) {
+      showToast('Copy failed — select the number manually.', 'warning');
+    }
+  });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,104 @@
+:root {
+  --bank-navy: #0b1f3a;
+  --bank-navy-soft: #13294b;
+  --bank-gold: #c9a227;
+  --bank-gold-hover: #ddb83a;
+  --bank-surface: #f4f6f9;
+}
+
+[data-bs-theme="dark"] {
+  --bank-navy: #0d1117;
+  --bank-navy-soft: #161b22;
+  --bank-gold: #d4af37;
+  --bank-gold-hover: #e5c35c;
+  --bank-surface: #0d1117;
+}
+
+.app-body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bank-surface);
+}
+
+.navbar-bank {
+  background: linear-gradient(90deg, var(--bank-navy), var(--bank-navy-soft));
+}
+
+.navbar-bank .nav-link {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.navbar-bank .nav-link:hover {
+  color: #fff !important;
+}
+
+.brand-mark {
+  width: 2.25rem;
+  height: 2.25rem;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--bank-gold);
+  font-size: 1.1rem;
+}
+
+.hero-card {
+  background: #fff;
+  overflow: visible;
+}
+
+[data-bs-theme="dark"] .hero-card {
+  background: var(--bank-navy-soft);
+}
+
+#searchSuggestions {
+  z-index: 1055;
+}
+
+.btn-bank-primary {
+  --bs-btn-color: #0b1f3a;
+  --bs-btn-bg: var(--bank-gold);
+  --bs-btn-border-color: var(--bank-gold);
+  --bs-btn-hover-bg: var(--bank-gold-hover);
+  --bs-btn-hover-border-color: var(--bank-gold-hover);
+  --bs-btn-hover-color: #0b1f3a;
+  --bs-btn-active-bg: #b89220;
+  --bs-btn-active-border-color: #b89220;
+  font-weight: 600;
+}
+
+[data-bs-theme="dark"] .btn-bank-primary {
+  --bs-btn-color: #0b1f3a;
+}
+
+.result-panel-inner {
+  background: rgba(201, 162, 39, 0.06);
+  border-color: rgba(201, 162, 39, 0.35) !important;
+}
+
+[data-bs-theme="dark"] .result-panel-inner {
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.25) !important;
+}
+
+.display-contact {
+  letter-spacing: 0.03em;
+}
+
+.tracking-wide {
+  letter-spacing: 0.12em;
+}
+
+.suggestion-item {
+  cursor: pointer;
+}
+
+.font-monospace {
+  font-variant-numeric: tabular-nums;
+}
+
+.table thead th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6c757d;
+}

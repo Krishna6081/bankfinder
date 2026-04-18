@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Staff signup · Bank Branch Contact Finder{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 420px;">
+  <div class="card border-0 shadow-lg mt-2">
+    <div class="card-body p-4 p-md-5">
+      <h1 class="h4 fw-bold mb-1">Staff signup</h1>
+      <p class="text-secondary small mb-4">Create a staff account to manage branch records.</p>
+      {% if form.errors %}
+        <div class="alert alert-danger small">Please correct the errors below.</div>
+      {% endif %}
+      <form method="post" action="{% url 'signup' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label" for="id_username">Username</label>
+          {{ form.username }}
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="id_password1">Password</label>
+          {{ form.password1 }}
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="id_password2">Confirm password</label>
+          {{ form.password2 }}
+        </div>
+        <button type="submit" class="btn btn-bank-primary w-100">Sign up</button>
+      </form>
+      <p class="small text-muted mt-4 mb-0 text-center">
+        <a href="{% url 'login' %}">← Back to staff login</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

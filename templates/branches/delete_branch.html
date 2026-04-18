@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Delete branch · Bank Branch Contact Finder{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 520px;">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small mb-0">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Delete</li>
+    </ol>
+  </nav>
+  <div class="card border-0 shadow-sm border-danger border-opacity-25">
+    <div class="card-body p-4">
+      <h1 class="h5 fw-bold text-danger mb-3">Delete branch?</h1>
+      <p class="mb-2">You are about to permanently remove this record from the directory:</p>
+      <ul class="mb-4">
+        <li><strong>{{ branch.branch_name }}</strong></li>
+        <li class="font-monospace">{{ branch.contact_number }}</li>
+      </ul>
+      <form method="post">
+        {% csrf_token %}
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-danger">Yes, delete</button>
+          <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

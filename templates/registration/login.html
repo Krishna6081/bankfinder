@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Staff login · Bank Branch Contact Finder{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 420px;">
+  <div class="card border-0 shadow-lg mt-2">
+    <div class="card-body p-4 p-md-5">
+      <h1 class="h4 fw-bold mb-1">Staff login</h1>
+      <p class="text-secondary small mb-4">Only authorised bank staff can manage branch records.</p>
+      {% if form.errors %}
+        <div class="alert alert-danger small">Invalid username or password.</div>
+      {% endif %}
+      <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label" for="id_username">Username</label>
+          <input type="text" name="username" autofocus required class="form-control" id="id_username"
+                 autocomplete="username">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="id_password">Password</label>
+          <input type="password" name="password" required class="form-control" id="id_password"
+                 autocomplete="current-password">
+        </div>
+        <input type="hidden" name="next" value="{{ next }}">
+        <button type="submit" class="btn btn-bank-primary w-100">Sign in</button>
+      </form>
+      <p class="small text-muted mt-4 mb-0 text-center">
+        <a href="{% url 'signup' %}">New staff? Sign up</a>
+      </p>
+      <p class="small text-muted mt-2 mb-0 text-center">
+        <a href="{% url 'home' %}">← Back to public search</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

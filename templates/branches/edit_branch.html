@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Edit branch · Bank Branch Contact Finder{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 640px;">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small mb-0">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Edit branch</li>
+    </ol>
+  </nav>
+  <h1 class="h4 fw-bold mb-1">Edit branch</h1>
+  <p class="text-secondary small mb-4">Updating: <strong>{{ branch.branch_name }}</strong></p>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+            {% for err in field.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-bank-primary">Save changes</button>
+          <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

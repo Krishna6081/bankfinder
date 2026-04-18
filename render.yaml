@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: bankfinder
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn bankfinder.wsgi:application
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+    databases:
+      - name: bankfinder-db
+        databaseName: bankfinder_db
+        user: bankfinder_user
+
+databases:
+  - name: bankfinder-db
+    ipWhitelist: []
